@@ -24,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/zmproni/kollect-login-bot/issues"
   },
-  "homepage": "https://github.com/zmproni/kollect-login-bot#readme"
+  "homepage": "https://github.com/zmproni/kollect-login-bot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1"
+  }
 }
