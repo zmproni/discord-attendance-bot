@@ -10,10 +10,7 @@ module.exports = {
     description: "Changes the user's nickname in the server.",
     usage: `${Config.prefix}nickname <Your new nickname>`,
     requireAdminRights: false,
-    /**
-     * @param {Message} message
-     * @param {Array.<string>} args
-     */
+    /** @param {Message} message @param {Array.<string>} args */
     async execute(message, args) {
         message.channel.send("Message received");
    }
