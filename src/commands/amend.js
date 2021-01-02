@@ -7,13 +7,14 @@ const command = "amend"
 /** @type{Command} */
 module.exports = {
   name: command,
-  description: "Allows user to ",
-  usage: `${Config.prefix}${command} <time> <note>
-  Eg: ${Config.prefix}attend 10:00am HQ
-  <time> -> Time clocking in in HH:mmtt format, enter "-" for current time.
-  <note> -> Additional information to append to attendance.
-  `,
+  description: "Allows user to amend the details of their ",
   requireAdminRights: false,
+  usage: `${Config.prefix}${command} <time> <note>
+  <time> -> Time clocking in in HH:mmtt format, enter "now" for current time.
+  <note> -> Additional information to append to attendance.
+  Eg:
+    ${Config.prefix}${command} 10:00am HQ
+    ${Config.prefix}${command} now Remote`,
   /**
    * @param {Message} message
    * @param {Array.<string>} args
