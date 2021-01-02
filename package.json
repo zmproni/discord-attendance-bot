@@ -1,6 +1,6 @@
 {
   "name": "discordkollectbot",
-  "version": "1.0.0",
+  "version": "0.0.1_SNAPSHOT",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,16 @@
     "type": "git",
     "url": "git+https://github.com/zmproni/kollect-login-bot.git"
   },
-  "author": "",
+  "contributors": [
+    {
+      "name": "Alessandro Joshua Zamproni",
+      "email": "zmproni@gmail.com"
+    },
+    {
+      "name": "Irfan Anadri Maulana",
+      "email": "irfananadri@gmail.com"
+    }
+  ],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/zmproni/kollect-login-bot/issues"
