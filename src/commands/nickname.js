@@ -1,18 +1,20 @@
 const { Message } = require("discord.js");
 
 /**
- * @typedef {{channelId: number, commandPrefix: string}} Args
+ * @typedef {{ import('../structure/command.js').Command }} Command
  */
 
+/** @type{Command} */
 module.exports = {
     name: "nickname",
     description: "Changes the user's nickname in the server.",
+    requireAdminRights: false,
     /**
      * @param {Message} message
-     * @param {Args} args
+     * @param {Array.<string>} args
      */
     async execute(message, args) {
-        /** @type {string?} */
-        let sand;
-    }
+        console.log("executed")
+        message.channel.send("Message received");
+   }
 }
