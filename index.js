@@ -1,9 +1,11 @@
-console.log('The bot has started.')
-
 require("dotenv").config();
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
+
+let dedicatedChannelId = null;
+let commandPrefix = "!";
+
 
 client.login(process.env.BOTTOKEN)
 
@@ -16,8 +18,5 @@ function ready() {
 client.on('message', gotMessage);
 
 function gotMessage(message) {
-    console.log(message.content);
-    if (message.content.toLowerCase() === 'ping') {
-        message.reply('pong');
-    }
+
 }
