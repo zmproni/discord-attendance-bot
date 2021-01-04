@@ -17,6 +17,7 @@ module.exports = {
     ${Config.prefix}${command} now Remote`,
   /** @param {Message} message @param {Array.<string>} args */
   async execute(message, args) {
+    
     message.channel.send("Message received");
   }
 }
