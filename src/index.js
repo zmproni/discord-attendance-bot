@@ -1,11 +1,14 @@
 require("dotenv").config();
 
+
+const config = require('../config.json')
+config.test = "something else"
+
 const Discord = require('discord.js');
 const Config = require('./util/config')
 
 const client = new Discord.Client();
 const commands = require('./commands');
-const { prefix } = require("./util/config");
 
 client.login(process.env.BOTTOKEN)
 client.on('ready', onReady);
