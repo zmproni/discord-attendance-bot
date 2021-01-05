@@ -20,12 +20,11 @@ function onReady() {
  * @param {Discord.Message} message
  */
 function onMessage(message) {
-    if (message.content.startsWith(Config.prefix) || message.author.bot) return;
+    if (!message.content.startsWith(Config.prefix) || message.author.bot) return;
     //** @type {Array.<string>} */
-    const args = message.content.slice(Config.prefix.length).trim().split(" ")
+    const args = message.content.slice(Config.prefix.length).trim().split(" ");
     const commandName = args.shift().toLowerCase();
 
-    let wasCommandFound = false;
     commands.forEach(command => {
         if (command.name !== commandName) return;
 
@@ -36,7 +35,6 @@ function onMessage(message) {
         }
 
         command.execute(message, args);
-        wasCommandFound = true;
     });
 
 }
