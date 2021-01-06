@@ -1,22 +1,19 @@
 require("dotenv").config();
 
-
 const config = require('../config.json')
-config.test = "something else"
 
 const Discord = require('discord.js');
 const Config = require('./util/config')
 
 const client = new Discord.Client();
 const commands = require('./commands');
+const help = require("./commands/help")
 
 client.login(process.env.BOTTOKEN)
 client.on('ready', onReady);
 client.on('message', onMessage);
 
-function onReady() {
-    console.log("Bot is online.");
-}
+function onReady() { console.log("Bot is online.") }
 
 /**
  * Method that runs upon being notified of new message in server
@@ -27,17 +24,22 @@ function onMessage(message) {
     //** @type {Array.<string>} */
     const args = message.content.slice(Config.prefix.length).trim().split(" ");
     const commandName = args.shift().toLowerCase();
+    const command = commands.find(command => command.name == commandName);
 
-    commands.forEach(command => {
-        if (command.name !== commandName) return;
+    if (commandName == help.name) {
+        help.execute(message, args);
+        return;
+    }
 
-        const hasAdminRight = message.member.roles.cache.find(role => role.name === Config.adminRole) == true;
-        if (command.requireAdminRights && !hasAdminRight) {
-            message.author.send('You do not possess the required account priviledges to run that command.')
-            return;
-        }
+    if (!command) {
+        help.execute(message, [commandName]);
+        return;
+    }
 
-        command.execute(message, args);
-    });
+    if (command.requireAdminRights != (message.memeber.roles.cache.find(role => role.name == Config.adminRole))){
+        message.author.send('You do not possess the required account priviledges to run that command.')
+        return;
+    }
 
+    command.execute(message, args);
 }
