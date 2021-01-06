@@ -1,5 +1,6 @@
 module.exports = [
   require('./nickname'),
   require('./amend'),
-  require('./attend')
+  require('./attend'),
+  require('./help'),
 ]
