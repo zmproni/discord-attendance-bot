@@ -8,11 +8,14 @@ const help = require("./src/commands/help");
 
 const client = new Discord.Client();
 
-client.login(process.env.BOTTOKEN)
+client.login(process.env.BOT_TOKEN)
 client.on('ready', onReady);
 client.on('message', onMessage);
 
-function onReady() { console.log("Bot is online.") }
+function onReady() {
+    
+    console.log("Bot is online.");
+}
 
 /**
  * Method that runs upon being notified of new message in server
