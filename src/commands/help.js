@@ -1,6 +1,6 @@
 const { Message } = require("discord.js");
 const Discord = require('discord.js');
-const Config = require("../util/config");
+const Config = require("../config");
 const commands = require("./index")
 
 const command = "help";

@@ -1,5 +1,5 @@
 const { Message } = require("discord.js");
-const Config = require("../util/config");
+const Config = require("../config");
 /**
  * @typedef {{ import('../structure/command').Command }} Command
  */

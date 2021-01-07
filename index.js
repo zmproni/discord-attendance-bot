@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const config = require('./config.json');
 const Discord = require('discord.js');
-const Config = require('./src/util/config');
+const Config = require('./src/config');
 const commands = require('./src/commands');
 const help = require("./src/commands/help");
 

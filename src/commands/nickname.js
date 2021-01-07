@@ -1,5 +1,5 @@
 const { Message, GuildMember } = require("discord.js");
-const Config = require("../util/config");
+const Config = require("../config");
 
 const command = "nickname";
 const usage = `${Config.prefix}${command} <nickname>
