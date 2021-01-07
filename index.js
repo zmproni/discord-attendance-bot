@@ -1,6 +1,5 @@
 require("dotenv").config();
 
-const config = require('./config.json');
 const Discord = require('discord.js');
 const Config = require('./src/config');
 const commands = require('./src/commands');
@@ -13,8 +12,10 @@ client.on('ready', onReady);
 client.on('message', onMessage);
 
 function onReady() {
-    
+    const credentials = require("./src/utils/sheets/credentials");
+    const gs = require("./src/utils/sheets/spreadsheets");
     console.log("Bot is online.");
+    gs.authorize(credentials, gs.listMajors);
 }
 
 /**
