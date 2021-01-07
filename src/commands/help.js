@@ -28,10 +28,18 @@ const notFound = new Discord.MessageEmbed()
 async function execute(message, args) {
   if (!args || args.length == 0) {
     const listOfCommands = commands.reduce((concat, { name }) => concat + Config.prefix + name + "\n", "")
-    message.channel.send(new Discord.MessageEmbed().setColor("#00FF00").setTitle("List of commands:").setDescription(listOfCommands).setFooter(`For more info on what a command does, type ${Config.prefix}${command} <command's name>`));
+    message.channel.send(
+      new Discord.MessageEmbed()
+        .setColor("#00FF00")
+        .setTitle("List of commands:")
+        .setDescription(listOfCommands)
+        .setFooter(`For more info on what a command does, type ${Config.prefix}${command} <command's name>`)
+    );
   } else {
     let command = commands.find(command => command.name == args[0]);
-    (command) ? message.channel.send(command.description) : (args[0] === command) ? message.channel.send(description) : message.channel.send(notFound)
+    (command) ? message.channel.send(command.description) :
+      (args[0] === command) ? message.channel.send(description) :
+        message.channel.send(notFound)
   }
 }
 
