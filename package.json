@@ -1,6 +1,6 @@
 {
   "name": "discord_attendance_tracker_bot",
-  "version": "0.0.1",
+  "version": "0.1.8",
   "description": "A bot that helps track attendance of server events or group sessions.",
   "main": "index.js",
   "scripts": {
@@ -23,8 +23,12 @@
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "google-spreadsheet": "^3.1.15",
+<<<<<<< HEAD
     "googleapis": "^66.0.0",
     "nanoid": "^3.1.20"
+=======
+    "googleapis": "^39.2.0"
+>>>>>>> 21faf2c9b57bfe5c89b3283fd837fd07281304f0
   },
   "devDependencies": {},
   "keywords": [],

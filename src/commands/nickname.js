@@ -1,12 +1,12 @@
-const { Message, GuildMember } = require("discord.js");
-const Config = require("../config");
+const { Message } = require("discord.js");
+const config = require("../utils/Config");
 
 const command = "nickname";
-const usage = `${Config.prefix}${command} <nickname>
+const usage = `${config.command_prefix}${command} <nickname>
     <nickname> -> Your new name that will be displayed on server and name displayed when marking your attendance. Can be set to default to reset to your Discord username.
     Eg:
-        ${Config.prefix}${command} Foo Bar
-        ${Config.prefix}${command} default
+        ${config.command_prefix}${command} Foo Bar
+        ${config.command_prefix}${command} default
     `
 module.exports = {
     name: command,

@@ -1,58 +1,87 @@
-const { Message } = require("discord.js");
+const fs = require('fs');
+const readline = require('readline');
 const { google } = require('googleapis');
-const keys = require("./keys")
 
-//web token
-const client = new google.auth.JWT(
-  keys.client_email,
-  null,
-  keys.private_key,
-  ['https://www.googleapis.com/auth/spreadsheets']
-);
+const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
+const TOKEN_PATH = 'token.json';
 
-//connect. token gives temp access which has to be renewed after a certain period of time
-client.authorize(function (err, tokens) {
-  if (err) {
-    console.log(err);
-    return;
-  } else {
-    console.log('Connected');
-    gsrun(client);
-  }
-});
-//for client to run google sheets
-async function gsrun(cl) {
+/**
+ * Create an OAuth2 client with the given credentials, and then execute the
+ * given callback function.
+ * @param {Object} credentials The authorization client credentials.
+ * @param {function} callback The callback to call with the authorized client.
+ */
+function authorize(credentials, callback) {
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
+  const oAuth2Client = new google.auth.OAuth2(
+    client_id, client_secret, redirect_uris[0]);
 
-  const gsapi = google.sheets({ version: 'v4', auth: cl });
+  // Check if we have previously stored a token.
+  fs.readFile(TOKEN_PATH, (err, token) => {
+    if (err) return getNewToken(oAuth2Client, callback);
+    oAuth2Client.setCredentials(JSON.parse(token));
+    callback(oAuth2Client);
+  });
+}
 
-  const opt = { //to get data
-    spreadsheetId: '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk', //link to the spreadsheet
-    range: 'Attendees!A2:D4'
-  };
-  var data = await gsapi.spreadsheets.values.get(opt); //get the information
-  var dataArray = data.data.values;
+/**
+ * Get and store new token after prompting for user authorization, and then
+ * execute the given callback with the authorized OAuth2 client.
+ * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
+ * @param {getEventsCallback} callback The callback for the authorized client.
+ */
+function getNewToken(oAuth2Client, callback) {
+  const authUrl = oAuth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: SCOPES,
+  });
+  console.log('Authorize this app by visiting this url:', authUrl);
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  rl.question('Enter the code from that page here: ', (code) => {
+    rl.close();
+    oAuth2Client.getToken(code, (err, token) => {
+      if (err) return console.error('Error while trying to retrieve access token', err);
+      oAuth2Client.setCredentials(token);
+      // Store the token to disk for later program executions
+      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+        if (err) return console.error(err);
+        console.log('Token stored to', TOKEN_PATH);
+      });
+      callback(oAuth2Client);
+    });
+  });
+}
 
-  dataArray = dataArray.map(function (r) {
-    while (r.length < 2) {
-      r.push('');
+/**
+ * Prints the names and majors of students in a sample spreadsheet:
+ * @see https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+ * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
+ */
+function listMajors(auth) {
+  const sheets = google.sheets({ version: 'v4', auth });
+  sheets.spreadsheets.values.get({
+    spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
+    range: 'Class Data!A2:E',
+  }, (err, res) => {
+    if (err) return console.log('The API returned an error: ' + err);
+    const rows = res.data.values;
+    if (rows.length) {
+      console.log('Name, Major:');
+      // Print columns A and E, which correspond to indices 0 and 4.
+      rows.map((row) => {
+        console.log(`${row[0]}, ${row[4]}`);
+      });
+    } else {
+      console.log('No data found.');
     }
-    return r;
   });
-  //console.log(dataArray);
+}
 
-  var newDataArray = dataArray.map(function (r) {
-    r.push(r[0] + '-' + r[1]);
-    return r;
-  });
-  //console.log(newDataArray);
-
-  const updateOptions = { //to update spreadsheet
-    spreadsheetId: '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk',
-    range: 'Attendees!E2',
-    valueInputOption: 'USER_ENTERED',
-    resource: { values: newDataArray }
-  };
-  let res = await gsapi.spreadsheets.values.update(updateOptions);
-  console.log(res);
-
+module.exports = {
+  authorize,
+  getNewToken,
+  listMajors,
 }

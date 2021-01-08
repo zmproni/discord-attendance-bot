@@ -1,8 +1,7 @@
 require("dotenv").config();
 
-const config = require('./config.json');
 const Discord = require('discord.js');
-const Config = require('./src/config');
+const config = require("./src/utils/Config");
 const commands = require('./src/commands');
 const help = require("./src/commands/help");
 
@@ -13,7 +12,6 @@ client.on('ready', onReady);
 client.on('message', onMessage);
 
 function onReady() {
-    
     console.log("Bot is online.");
 }
 
@@ -22,9 +20,11 @@ function onReady() {
  * @param {Discord.Message} message
  */
 function onMessage(message) {
-    if (!message.content.startsWith(Config.prefix) || message.author.bot) return;
+    const { command_prefix, admin_role } = config;
+
+    if (!message.content.startsWith(command_prefix) || message.author.bot) return;
     //** @type {Array.<string>} */
-    const args = message.content.slice(Config.prefix.length).trim().split(" ");
+    const args = message.content.slice(command_prefix.length).trim().split(" ");
     const commandName = args.shift().toLowerCase();
     const command = commands.find(command => command.name == commandName);
 
@@ -38,7 +38,7 @@ function onMessage(message) {
         return;
     }
 
-    if (command.requireAdminRights != (message.memeber.roles.cache.find(role => role.name == Config.adminRole))){
+    if (command.requireAdminRights != (message.memeber.roles.cache.find(role => role.name == admin_role))){
         message.author.send('You do not possess the required account priviledges to run that command.')
         return;
     }
