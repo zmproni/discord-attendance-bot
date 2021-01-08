@@ -1,6 +1,6 @@
 {
   "name": "discord_attendance_tracker_bot",
-  "version": "0.0.1",
+  "version": "0.1.8",
   "description": "A bot that helps track attendance of server events or group sessions.",
   "main": "index.js",
   "scripts": {
