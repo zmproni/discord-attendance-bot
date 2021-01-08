@@ -1,5 +1,5 @@
 {
   "command_prefix": "!",
-  "channel_id": "",
-  "admin_role": ""
+  "channel_id": 2,
+  "admin_role": "Administrator"
 }
