@@ -2,11 +2,16 @@
 
 const fs = require('fs')
 
-module.exports = function read ( path ) {
+function read ( path ) {
   const data = fs.readFileSync(path);
   return JSON.parse(data);
 }
 
-module.exports = function writeRoot( json, path ) {
-  return write( root() + path || "" ,json)
+function write( path, data ) {
+  return fs.writeFileSync(path, data)
+}
+
+module.exports = {
+  read,
+  write
 }

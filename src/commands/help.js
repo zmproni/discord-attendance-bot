@@ -1,19 +1,19 @@
 const { Message } = require("discord.js");
 const Discord = require('discord.js');
-const Config = require("../config");
+const config = require("../utils/Config");
 const commands = require("./index")
 
 const command = "help";
 const requireAdminRights = false;
 const description = new Discord.MessageEmbed()
   .setColor('#304281')
-  .setTitle(Config.prefix + command)
+  .setTitle(config.command_prefix + command)
   .setDescription("Display list of commands available and commands' details.")
   .addFields(
     { name: "Requires admin rights: ", value: requireAdminRights, inline: true },
-    { name: "Usage", value: "${Config.prefix}${command} <command name>" },
+    { name: "Usage", value: `${config.command_prefix}${command} <command name>` },
     { name: "Parameters", value: "<command name> -> Optional, leave empty for full list of commands. Name of the command to view explanation and usage of command." },
-    { name: "Examples: ", value: Config.prefix + command + "\n" + Config.prefix + command + " attend" }
+    { name: "Examples: ", value: config.command_prefix + command + "\n" + config.command_prefix + command + " attend" }
   );
 const notFound = new Discord.MessageEmbed()
   .setColor('#ff0000')
@@ -27,13 +27,13 @@ const notFound = new Discord.MessageEmbed()
  */
 async function execute(message, args) {
   if (!args || args.length == 0) {
-    const listOfCommands = commands.reduce((concat, { name }) => concat + Config.prefix + name + "\n", "")
+    const listOfCommands = commands.reduce((concat, { name }) => concat + config.command_prefix + name + "\n", "")
     message.channel.send(
       new Discord.MessageEmbed()
         .setColor("#00FF00")
         .setTitle("List of commands:")
         .setDescription(listOfCommands)
-        .setFooter(`For more info on what a command does, type ${Config.prefix}${command} <command's name>`)
+        .setFooter(`For more info on what a command does, type ${config.command_prefix}${command} <command's name>`)
     );
   } else {
     let command = commands.find(command => command.name == args[0]);
