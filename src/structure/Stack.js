@@ -19,6 +19,9 @@ class Stack{
         return this.top === 0;
     }
     
+    /**
+     * Return the data that is currently on top of the stack
+     */
     peek() {
         return this.data[this.top-1];
      }

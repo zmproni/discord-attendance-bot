@@ -4,4 +4,6 @@ module.exports = [
   require('./amend'),
   require('./attend'),
   require('./schedule'),
+  require('./check'),
+  require('./remove')
 ]
