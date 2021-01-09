@@ -4,12 +4,14 @@ const Config = require("../utils/config");
 const Session = require("../structure/Session");
 const Moment = require('moment');
 const command = "schedule";
-let date = new Date();
-const usage = `${Config.command_prefix}${command} <start_time> <duration>
-    <schedule> -> Schedule a session.
+
+const usage = `${Config.command_prefix}${command} <start_time> <duration> <session_name>
+    <start_time> -> The start time of the session
+    <duration> -> The duration of when the user can take attendance
+    ?<session_name> -> Optional. The name of the session, a name will be auto generated if you leave this empty (can only be one word)
     Eg:
-    ${Config.command_prefix}${command} 09:00 1h
-    ${Config.command_prefix}${command} 21:00 1h30m
+    ${Config.command_prefix}${command} 09:00 1h session_80
+    ${Config.command_prefix}${command} 21:00 1h30m 
     ${Config.command_prefix}${command} 02:00 1h30m2s
     `
 module.exports = {
@@ -21,18 +23,23 @@ module.exports = {
     async execute(message, args){
         let timeExpression = /^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?/g;
         let durationExpression = /^(([\d]+)(h{1}|m{1}|s{1}|$)){1,3}/g;
-        
+        let name;
         let startTime;
         let today = Moment().format("YYYY/MM/DD");;
-        let name = Moment().format(`DD-MM-YYYY_[SESSION]`);
         let startDateTime;
         let durationArray;
-
-        
-        //If there are no arguments, or if there are more than 2 arguments
-        if(args[0] == undefined || args[1] == undefined || args[2] != undefined){
+    
+        //If there are no arguments, or if there user over-inputted
+        if(args[0] == undefined || args[1] == undefined || args[3] != undefined){
             message.channel.send(usage);
             return;
+        }
+
+        //Check if session name is defined or not
+        if(args[2] == undefined){
+            name = Moment().format(`DD-MM-YYYY_[SESSION]`);
+        }else{
+            name = args[2].toString().replace(/,/g, ' ');
         }
 
         //Validate Time argument
@@ -65,16 +72,16 @@ module.exports = {
 
         let session = new Session(name, startDateTime, duration);
 
-        session.scheduleSession();
-
-        if(session.isActive()){
-            const notification = new Discord.MessageEmbed()
+        if(!session.scheduleSession()){
+            const scheduleRejection = new Discord.MessageEmbed()
             .setColor('#ff0000')
             .setTitle(`Can't Schedule Session`)
             .setDescription("A session has already been scheduled for today");           
+            message.channel.send(scheduleRejection);
             return;
         }
 
+        if (session.scheduleSession()){}
         const notification = new Discord.MessageEmbed()
             .setColor('#fcfa65')
             .setTitle(`Session: ${session.name}`)
@@ -86,25 +93,5 @@ module.exports = {
         );
 
         message.channel.send(notification);
-        
-        
-        /*
-        if(args[0] != undefined && args[1] != undefined){
-            let startTime = args[0].split(':');         
-            let endTime = args[1].split(':');
-            
-            let todayDate = Moment().format("YYYY/MM/DD");
-
-            let name = Moment().format(`DD-MM-YYYY_[SESSION]`);            
-
-            let startDateTime = Moment(`${todayDate} ${startTime[0]}:${startTime[1]}:00`,`YYYY/MM/DD hh:mm:ss`)
-            let endDateTime = Moment(`${todayDate} ${endTime[0]}:${endTime[1]}:00`,`YYYY/MM/DD hh:mm:ss`);
-            
-            let session = new Session(name, startDateTime, endDateTime);
-            session.scheduleSession();
-        }     
-        */
-
-        
     }
 }

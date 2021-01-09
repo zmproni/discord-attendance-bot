@@ -1,4 +1,5 @@
-const { Message } = require("discord.js");
+const { Message, MessageEmbed } = require("discord.js");
+const Discord = require('discord.js');
 const config = require("../utils/Config");
 
 const command = "nickname";
@@ -28,7 +29,11 @@ module.exports = {
         }
 
         if (!(message.guild.me.hasPermission("MANAGE_NICKNAMES") && !message.member.hasPermission("MANAGE_NICKNAMES"))) {
-            message.channel.send("Insufficient permissions to change your nickname.");
+            let insufficientPermission = new Discord.MessageEmbed()
+                .setColor('#ff0000')
+                .setTitle(`Can't change nickname`)
+                .setDescription("Insufficient permissions to change your nickname.");   
+            message.channel.send(insufficientPermission);
             return;
         }
 
@@ -38,7 +43,12 @@ module.exports = {
                 console.log(e)
                 message.channel.send(`An error has occurred: ${e}`)
             });
-            message.channel.send("Your server nickname has been reverted back to " + nickname);
+
+            let defaultNicknameMessage = new Discord.MessageEmbed()
+                .setColor('#4287f5')
+                .setTitle(`Your nickname has been succesfully reverted`)
+                .setDescription("Your server nickname has been reverted back to " + nickname);   
+            message.channel.send(newNicknameMessage);
             return;
         }
 
@@ -46,7 +56,11 @@ module.exports = {
             console.log(e)
             message.channel.send(`An error has occured: ${e}`)
         });
-        message.channel.send("Your server nickname has been changed to " + nickname);
 
+        let newNicknameMessage = new Discord.MessageEmbed()
+            .setColor('#4287f5')
+            .setTitle(`Your nickname has been succesfully changed`)
+            .setDescription("Your server nickname has been changed to " + nickname);   
+        message.channel.send(newNicknameMessage);
     }
 }
