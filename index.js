@@ -38,8 +38,8 @@ function onMessage(message) {
         return;
     }
 
-    if (command.requireAdminRights != (message.memeber.roles.cache.find(role => role.name == admin_role))){
-        message.author.send('You do not possess the required account priviledges to run that command.')
+    if (command.requireAdminRights && !(message.member.roles.cache.find(role => role.name===admin_role))){
+        message.author.send('You do not possess the required account priviledges to run that command.');        
         return;
     }
 

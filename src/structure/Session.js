@@ -1,8 +1,8 @@
 const { nanoid } = require('nanoid');
-const Stack = require('./Stack')
+const Stack = require('./Stack');
 
 let stack = new Stack();
-let date = new Date();
+const Moment = require('moment');
 
 class Session {
     constructor(name, startDateTime, duration) {
@@ -10,7 +10,8 @@ class Session {
         this._startDateTime = startDateTime;
         this._attendanceList = [];
         this.name = name;
-        this.duration = duration ; // Figure out what data struct to use
+        this.duration = duration;
+        this.endDateTime = Moment(this._startDateTime, 'HH:mm:ss').add(duration);
     }
 
     /**
@@ -23,14 +24,13 @@ class Session {
                 startDateTime: this._startDateTime,
                 attendanceList: this._attendanceList,
                 name: this.name,
-                duration: this.duration
+                endDateTime: this.endDateTime
             }
-
             stack.push(session)
-            console.log(this.isActive());
+            return true;
         }
         else{
-            console.log(`A session has already been scheduled for today`);
+            return false;
         }
     }
 
@@ -60,21 +60,12 @@ class Session {
         let currentSession = stack.peek();
         console.log(currentSession.startDateTime)
         
-        if(date >= currentSession.startDateTime){
+        if(Moment().isAfter(currentSession.startDateTime)  && Moment().isBefore(currentSession.endDateTime)){
             return true;
         }
         else{
             return false;
         }
-        
-    }
-
-    isEmpty(){
-        if (this.top===0)
-        return true;
-
-        else
-        return false;
     }
 
     get id() {
