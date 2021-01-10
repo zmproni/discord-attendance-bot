@@ -1,6 +1,8 @@
 const { Message } = require("discord.js");
 const { google } = require('googleapis');
 const sheets = google.sheets('v4');
+const schedule = require('../src/commands/schedule.js');
+const nickname = require('../src/commands/nickname.js');
 require("dotenv").config();
 
 async function authorize(){
@@ -26,48 +28,51 @@ const authClient = await authorize();
 
 const gsapi = google.sheets({ sheets, authClient });
 
-async function view(spreadsheetID){
-  //   /* to view data -- users get to view the employees that are absent/on leave
-//    and to check if their input is correct*/
+async function viewAttendance(viewOpt){
   const opt = { 
     spreadsheetId: '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk', //link to the spreadsheet -- admin to fill in
     range: 'Attendees!B:E',
-    dateTimeRenderOption:''
+    dateTimeRenderOption: schedule.startDateTime
    };
-  var data = await gsapi.spreadsheets.values.get(opt);
-  var dataArray = data.data.values; 
+  let data = await gsapi.spreadsheets.values.get(viewOpt);
+  return data;
 
 }
 
+async function blankInput(r){
+  let data = viewAttendance(viewOpt);
+  let dataArray = data.data.values;
+  let newDataArray = dataArray.map(function(r) {
+    while (r.length < 5) {
+     console.log("Error, please re-enter your details");
+     r.push('');
+    }
+    let r = await gsapi.spreadsheets.values.clear(r);
+    return r;
+   } );
+  }
+
+async function editAttendance(updateOpt){
+  const updateOpt = { 
+    spreadsheetId: '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk', //admin to fill this up
+    range: 'Attendees!B:E',
+    valueInputOption: 'USER_ENTERED', //search for username - if username == cell value: replace to new values
+    resource: { values: newDataArray }
+  };
+  let res = await gsapi.spreadsheets.values.update(updateOpt);
+  return res;
+}
+
+async function addAttendance(){
+  const addOpt = { 
+    spreadsheetId: '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk', //admin to fill this up
+    range: '',
+    valueInputOption: 'USER_ENTERED',
+    insertDataOption:'',
+    resource: { values: newDataArray }
+  };
+  let res = await gsapi.spreadsheets.values.append(addOpt);
+  return res;
+}
 
 
-// // if all cells aren't filled, output error
-//   dataArray = dataArray.map(function (r) {
-//     while (r.length < 5) {
-//       console.log("Error, please re-enter your details");
-//       r.push('');
-//     }
-//     return r;
-//   });
-// /*  to update spreadsheet -- for users to edit the spreadsheet if they entered wrong values/
-// want to change any values entered by them. */
-//   const updateOptions = { 
-//     spreadsheetId: '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk', //admin to fill this up
-//     range: '',
-//     valueInputOption: 'USER_ENTERED', //search for username - if username == cell value: replace to new values
-//     resource: { values: newDataArray }
-//   };
-//   let res = await gsapi.spreadsheets.values.update(updateOptions);
-//   console.log(res);
-
-//   //append values -- take attendance: attend, remote, hq, leave
-//   const appendOptions = { 
-//     spreadsheetId: '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk', //admin to fill this up
-//     range: '',
-//     valueInputOption: 'USER_ENTERED',
-//     insertDataOption:'',
-//     resource: { values: newDataArray }
-//   };
-//   let res = await gsapi.spreadsheets.values.append(appendOptions);
-//   console.log(res);
-// }
