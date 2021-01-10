@@ -70,7 +70,7 @@ class Session {
     }
 
     fetchAttendance() {
-
+        return this.getActiveSession().attendanceList;
     }
 
     getActiveSession(){
@@ -80,7 +80,6 @@ class Session {
 
     isActive() { 
         let currentSession = this.getActiveSession();
-        console.log(currentSession.startDateTime)
         
         if(Moment().isAfter(currentSession.startDateTime) && Moment().isBefore(currentSession.endDateTime)){
             return true;

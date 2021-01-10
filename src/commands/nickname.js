@@ -48,7 +48,7 @@ module.exports = {
                 .setColor('#4287f5')
                 .setTitle(`Your nickname has been succesfully reverted`)
                 .setDescription("Your server nickname has been reverted back to " + nickname);   
-            message.channel.send(newNicknameMessage);
+            message.channel.send(defaultNicknameMessage);
             return;
         }
 

@@ -1,5 +1,5 @@
 const Session = require('./Session');
-const Session = require('./Stack')
+const Stack = require('./Stack')
 
 let session = new Session();
 let stack = new Stack();
@@ -16,9 +16,23 @@ class Attendance {
     }
 
     attend(){
-        if(!stack.isEmpty()){
-            push()
+        let attendance = {
+            username: this.username,
+            nickname: this.nickname,
+            time: this.time,
+            sessionId: this.sessionId,
+            note: this.note,
+            type: this.type,
         }
+        let currentSessionList = [];
+
+        if(!session.noSession()){
+            currentSessionList = session.getActiveSession().attendanceList;
+            currentSessionList.push(attendance);
+            return true;
+        }else{
+            return false;
+        }   
     }
     
 }
