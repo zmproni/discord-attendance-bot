@@ -1,37 +1,45 @@
 const { Message } = require("discord.js");
 const { google } = require('googleapis');
-const credentials = require("./credentials.js");
+const sheets = google.sheets('v4');
+require("dotenv").config();
 
-//web token -- admin set this up
-const client = new google.auth.JWT(
-  credentials.client_email, 
-  null,
-  credentials.private_key, 
-  ['https://www.googleapis.com/auth/spreadsheets'] //no need to change
-);
+async function authorize(){
+  const client = new google.auth.JWT(
+    process.env.GS_CLIENT_EMAIL, 
+    null,
+    process.env.GS_PRIVATE_KEY, 
+    ['https://www.googleapis.com/auth/spreadsheets'] //SCOPES
+  );
+  
+  //connect
+  client.authorize(function (err, tokens) {
+    if (err) {
+      console.log(err);
+      return;
+    } else {
+      console.log('Connected');
+    }
+  });
+  
+}
+const authClient = await authorize();
 
-//connect
-client.authorize(function (err, tokens) {
-  if (err) {
-    console.log(err);
-    return;
-  } else {
-    console.log('Connected');
-  }
-});
-// //for client to run google sheets
-// async function gsrun(cl) {
+const gsapi = google.sheets({ sheets, authClient });
 
-//   const gsapi = google.sheets({ version: 'v4', auth: cl });
-
-//   /* to view data -- users get to view the employees that are absent/on leave
+async function view(spreadsheetID){
+  //   /* to view data -- users get to view the employees that are absent/on leave
 //    and to check if their input is correct*/
-//   const opt = { 
-//     spreadsheetId: '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk', //link to the spreadsheet -- admin to fill in
-//     range: 'Attendees!B:E' 
-//   };
-//   var data = await gsapi.spreadsheets.values.get(opt); //get the information
-//   var dataArray = data.data.values; 
+  const opt = { 
+    spreadsheetId: '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk', //link to the spreadsheet -- admin to fill in
+    range: 'Attendees!B:E',
+    dateTimeRenderOption:''
+   };
+  var data = await gsapi.spreadsheets.values.get(opt);
+  var dataArray = data.data.values; 
+
+}
+
+
 
 // // if all cells aren't filled, output error
 //   dataArray = dataArray.map(function (r) {
