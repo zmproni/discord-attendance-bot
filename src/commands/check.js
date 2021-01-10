@@ -5,24 +5,40 @@ const Session = require("../structure/Session");
 const Stack = require("../structure/Stack");
 
 const command = "check";
-const usage = `${Config.command_prefix}${command}
-    <schedule> -> Check if there are any active session
-    Eg:
-    ${Config.command_prefix}${command}
-    `
+const descriptionText = "Check if there are any session scheduled";
+const usageText = `${Config.command_prefix}${command}`;
+const requireAdminRights = false;
+
+const description = new Discord.MessageEmbed()
+            .setColor('#fcfa65')
+            .setTitle(Config.command_prefix + command)
+            .setDescription(descriptionText)
+            .addFields(
+                {name: "Requires admin rights: ", value: requireAdminRights, inline: true },
+                {name: "Usage", value: `${Config.command_prefix}${command} <command name>` },
+            );
+
+//Command usage
+const usage = new Discord.MessageEmbed()
+.setColor('#fcfa65')
+.setTitle(`${Config.command_prefix}${command}`)
+.addFields(
+    {name: "Usage", value: usageText}
+);
+
 module.exports = {
     name: command,
-    description: "Check if there are any session scheduled",
+    description,
     usage,
     requireAdminRights: false,
 
-    /**
-     * @param {*} message 
-     * @param {*} args 
-     */
-
     async execute(message, args){
         let currentSession = new Session();
+
+        if(args[0]!=undefined){
+            message.channel.send(usage);
+            return;
+        }
 
         if(currentSession.noSession()){
             const noSession = new Discord.MessageEmbed()
@@ -44,6 +60,8 @@ module.exports = {
                     {name:'Session Duration', value:`${sessionInfo.duration.hours()} Hours ${sessionInfo.duration.minutes()} Minutes ${sessionInfo.duration.seconds()} Seconds`});
             message.channel.send(sessionExist);
         }
+
+        
     }
 }
 
