@@ -5,5 +5,7 @@ module.exports = [
   require('./attend'),
   require('./schedule'),
   require('./check'),
-  require('./remove')
+  require('./remove'),
+  require('./leave'),
+  require('./absent')
 ]

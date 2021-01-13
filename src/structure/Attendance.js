@@ -1,8 +1,6 @@
 const Session = require('./Session');
-const Stack = require('./Stack')
 
 let session = new Session();
-let stack = new Stack();
 
 class Attendance {
 
@@ -34,7 +32,6 @@ class Attendance {
             return false;
         }   
     }
-    
 }
 
 module.exports = Attendance;

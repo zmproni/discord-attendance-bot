@@ -25,6 +25,7 @@ const description = new Discord.MessageEmbed()
                     {name: "Parameters", value: parameters},
                     {name: "Examples: ", value: examples,}
                 );
+
 const usage = new Discord.MessageEmbed()
               .setColor(color)
               .setTitle(`${config.command_prefix}${command}`)
@@ -47,11 +48,10 @@ module.exports = {
     let today = Moment().format('YYYY/MM/DD');
     let timeArray = [];
     let time;
-    let note = args[1];
+    let note = args[1]; 
 
-    if(args.length > 2 &&
-      (!timeExpression.test(args[0]) || 
-      args[0] != 'now')){
+    if(args.length > 2 || !timeExpression.test(args[0]) && args[0] != 'now' ||
+      args[0]==undefined || args[1]==undefined){
       message.channel.send(usage);
       return;
     }
@@ -94,24 +94,20 @@ module.exports = {
       return;
     }
 
-    let attendance = new Attendance(username, 
-                                    nickname, 
-                                    time, 
-                                    currentSession.id, 
-                                    note, 
-                                    "Present");
+    let attendance = new Attendance(username, nickname, time, currentSession.id, note, "Present");
 
     if(attendance.attend()){
-      let attendanceList = session.fetchAttendance();
-      let list = '';
-      for(let i = 0; i < attendanceList.length; i++){
-        list += `${attendanceList[i].username} ${attendanceList[i].nickname} ${Moment(attendanceList[i].time).format('HH:mm')} ${attendanceList[i].note} ${attendanceList[i].type}\n`
-      }
+      let attendanceList = session.generateAttendanceList();
+      
       const attendanceSession = new Discord.MessageEmbed()
             .setColor(color)
             .setTitle("Attendance Taken")
-            .setDescription(list);        
-      message.channel.send(attendanceSession); 
+            .addFields(
+              {name: "Present", value: attendanceList.present},
+              {name: "On Leave", value: attendanceList.leave},
+              {name: "Absent", value: attendanceList.absent}
+          )  
+      message.channel.send(attendanceSession);
     }
   }
 }

@@ -65,12 +65,50 @@ class Session {
         return nanoid();
     }
 
-    editAttendace() {
+    editAttendace(username, time, note) {
+        let currentSession = this.getActiveSession();
+        if(currentSession.attendanceList.some(e => e.username === username)){
+            let index = currentSession.attendanceList.findIndex(e => e.username === username);
+            console.log(time);
+            console.log(note);
+            this.fetchAttendance()[index].time = time;
+            this.fetchAttendance()[index].note = note;
+            return true;
+        }
 
+        return false;
     }
 
     fetchAttendance() {
         return this.getActiveSession().attendanceList;
+    }
+
+    /**
+     * generate an attendance list in string form for output purposes
+     */
+    generateAttendanceList(){
+        let attendanceList = this.fetchAttendance();
+        let list = {present: "",
+            leave: "",
+            absent: ""
+        }
+
+        for(let i = 0; i < attendanceList.length; i++){
+            if(attendanceList[i].type==='Present')
+            list.present += `${attendanceList[i].username} - ${attendanceList[i].nickname} - ${Moment(attendanceList[i].time).format('HH:mm')} - ${attendanceList[i].note} - ${attendanceList[i].type}\n`
+
+            if(attendanceList[i].type==='On Leave')
+            list.leave += `${attendanceList[i].username} - ${attendanceList[i].nickname} - ${attendanceList[i].note} - ${attendanceList[i].type}\n`
+
+            if(attendanceList[i].type==='Absent')
+            list.absent += `${attendanceList[i].username} - ${attendanceList[i].nickname} - ${attendanceList[i].note} - ${attendanceList[i].type}\n`
+        }
+        
+        if(list.present === "")list.present = "None";
+        if(list.leave === "") list.leave = "None";
+        if(list.absent === "") list.absent = "None";
+
+        return list;
     }
 
     getActiveSession(){

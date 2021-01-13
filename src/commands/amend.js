@@ -1,22 +1,107 @@
-const { Message } = require("discord.js");
-const config = require("../utils/Config");
-/**
- * @typedef {{ import('../structure/command').Command }} Command
- */
-const command = "amend"
-/** @type{Command} */
+const { Message, MessageEmbed } = require("discord.js");
+const Discord = require("discord.js");
+const Config = require("../utils/Config");
+const Session = require("../structure/Session");
+const Attendance = require("../structure/Attendance");
+const Moment = require('moment');
+
+const command = "amend";
+const color = "#b03ed6";
+const requireAdminRights = false;
+const descriptionText = "Allows user to amend the details of their attendance";
+const usageText = `${Config.command_prefix}${command} <time> <note>`;
+const parameters = `<time> -> Time clocking in in HH:mmtt format or enter "now" for current time.
+<note> -> Additional information to append to attendance.`
+const examples = `${Config.command_prefix}${command} 10:00am HQ
+${Config.command_prefix}${command} now Remote`;
+
+const description = new Discord.MessageEmbed()
+                    .setColor(color)
+                    .setTitle(Config.command_prefix + command)
+                    .setDescription(descriptionText)
+                    .addFields(
+                        {name: "Requires admin rights: ", value: requireAdminRights, inline: true },
+                        {name: "Usage", value: usageText},
+                        {name: "Parameters", value: parameters},
+                        {name: "Examples: ", value: examples,}
+                    );
+
+const usage = new Discord.MessageEmbed()
+              .setColor(color)
+              .setTitle(`${Config.command_prefix}${command}`)
+              .addFields(
+                  {name: "Usage", value: usageText},
+                  {name: "Parameters", value: parameters},
+                  {name: "Examples", value: examples}
+              );
+
 module.exports = {
   name: command,
-  description: "Allows user to amend the details of their ",
-  requireAdminRights: false,
-  usage: `${config.command_prefix}${command} <time> <note>
-  <time> -> Time clocking in in HH:mmtt format or enter "now" for current time.
-  <note> -> Additional information to append to attendance.
-  Eg:
-    ${config.command_prefix}${command} 10:00am HQ
-    ${config.command_prefix}${command} now Remote`,
-  /** @param {Message} message @param {Array.<string>} args */
+  description,
+  requireAdminRights,
+  usage,
   async execute(message, args) {
-    message.channel.send("Message received");
+    let session = new Session();
+    const username = message.author.username;
+    let timeExpression = /^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?/g;
+    let today = Moment().format('YYYY/MM/DD');
+    let timeArray = [];
+    let time;
+    let note = args[1];
+
+    if(args.length > 2 || !timeExpression.test(args[0]) && args[0] != 'now' ||
+      args[0]==undefined || args[1]==undefined){
+      message.channel.send(usage);
+      return;
+    }
+
+    if(session.noSession()){
+      const noSession = new Discord.MessageEmbed()
+            .setColor('#ff0000')
+            .setTitle(`No Session`)
+            .setDescription("Can't amend attendance because there is no active session.");           
+            message.channel.send(noSession);
+      return;
+    }
+    
+    let currentSession = session.getActiveSession();
+
+    if(args[0] == 'now'){
+      timeArray = Moment().format('HH:mm').split(':');
+    }
+    else{
+      timeArray = args[0].split(':');
+    }
+
+    time = Moment(`${today} ${timeArray[0]}:${timeArray[1]}:00`, `YYYY/MM/DD HH:mm:ss`);
+
+    if(time.isBefore(currentSession.startDateTime) || time.isAfter(currentSession.endDateTime)){
+      const attendTimeInvalid = new Discord.MessageEmbed()
+            .setColor("#ff0000")
+            .setTitle("Invalid Attendance Time")
+            .setDescription("Input time according to session time");           
+            message.channel.send(attendTimeInvalid);
+      return;
+    }
+
+    if(!currentSession.attendanceList.some(e => e.username === username)){
+      const usernameNotFound = new Discord.MessageEmbed()
+            .setColor("#ff0000")
+            .setTitle("Username Not Found")
+            .setDescription("You haven't taken your attendance.");           
+            message.channel.send(usernameNotFound);
+      return;
+    }
+
+    session.editAttendace(username, time, note);
+
+    const attendanceEdited = new Discord.MessageEmbed()
+                            .setColor(color)
+                            .setTitle("Attendance Amended")
+                            .setDescription(`Your attendance detail has been amended
+                                            ${username} ${Moment(time).format('HH:mm')} ${note}`);
+    message.channel.send(attendanceEdited);
+    console.log(session.fetchAttendance());
+
   }
 }

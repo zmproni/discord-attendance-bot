@@ -59,21 +59,16 @@ module.exports = {
         let today = Moment().format("YYYY/MM/DD");;
         let startDateTime;
         let durationArray = [];
-    
+
         //Validations
-        if((args[0] == undefined || 
-            args[1] == undefined || 
-            args.length > 3) &&
-            (args[0] != "now" || 
-            !timeExpression.test(args[0]) ||
-            !durationExpression.test(args[1])
-            )){
+        if(args[0] === undefined || args[0] != "now" && !timeExpression.test(args[0]) ||
+            args[1] === undefined || !durationExpression.test(args[1]) || args.length > 3){
             message.channel.send(usage);
             return;
         }
 
         //Check if session name is defined or not
-        if(args[2] == undefined){
+        if(args[2] === undefined){
             name = Moment().format(`DD-MM-YYYY_[SESSION]`);
         }else{
             name = args[2].toString().replace(/,/g, ' ');
@@ -90,7 +85,7 @@ module.exports = {
         startDateTime = Moment(`${today} ${startTime[0]}:${startTime[1]}:00`,`YYYY/MM/DD HH:mm:ss`);
 
         durationArray = args[1].replaceAll(/\D/g,',').split(',');
-        
+
         
         let duration = Moment.duration({
             hours: durationArray[0],
@@ -120,15 +115,26 @@ module.exports = {
 
         message.channel.send(notification);
         
+
         setTimeout(
             function(){
-                const scheduleRejection = new Discord.MessageEmbed()
+                let attendanceList = session.generateAttendanceList();
+
+                const sessionTimeout = new Discord.MessageEmbed()
                 .setColor('#fcfa65')
                 .setTitle(`Session Over`)
-                .setDescription(`Session ${name} is over`);           
-                message.channel.send(scheduleRejection);
+                .setDescription(`Session ${name} is over. Below are the attendance for today:`)
+                .addFields({name: "Present", value: attendanceList.present},
+                        {name: "On Leave", value: attendanceList.leave},
+                        {name: "Absent", value: attendanceList.absent}
+                );
+
+                if(!session.noSession()){
+                    message.channel.send(sessionTimeout);
+                }
 
                 session.removeSession(name);
-            }, duration.asMilliseconds());
+        }, duration.asMilliseconds());
+        
     }
 }
