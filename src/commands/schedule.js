@@ -3,14 +3,17 @@ const Discord = require('discord.js');
 const Config = require("../utils/config");
 const Session = require("../structure/Session");
 const Moment = require('moment');
+const Time = require('../utils/Time');
+const { validateTime } = require("../utils/Time");
+const Validator = require("../utils/Validator");
 
 const command = "schedule";
 
 /**
  * DEV NOTE:
  * - Code is still messy/overbloated
- * - Haven't put "now" argument
- * - Validation isn't completed
+ * - Validation isn't completed (Duration)
+ * - setTimeout doesn't start according to startDateTime. (It starts immediately after command)
  */
 
 const requireAdminRights = true;
@@ -19,8 +22,8 @@ const usageText = `${Config.command_prefix}${command} <start_time> <duration> <s
 const parameters = "<start_time> -> The start time of the session\n" +
                 "<duration> -> The duration of when the user can take attendance\n" +
                 "<session_name> -> Optional, The name of the session, a name will be auto generated if you leave this empty (can only be one word)\n";
-const examples = "!schedule 09:00 1h session_80\n" +
-                "!schedule 21:00 1h30m\n" +
+const examples = "!schedule 09:00 1h0m0s session_80\n" +
+                "!schedule 21:00 1h30m0s\n" +
                 "!schedule 02:00 1h30m2s\n";
 
 //Command description
@@ -52,46 +55,15 @@ module.exports = {
     requireAdminRights,
 
     async execute(message, args){
-        let timeExpression = /^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?/g;
-        let durationExpression = /^(([\d]+)(h{1}|m{1}|s{1}|$)){1,3}/g;
-        let name;
-        let startTime;
-        let today = Moment().format("YYYY/MM/DD");;
-        let startDateTime;
-        let durationArray = [];
-
         //Validations
-        if(args[0] === undefined || args[0] != "now" && !timeExpression.test(args[0]) ||
-            args[1] === undefined || !durationExpression.test(args[1]) || args.length > 3){
+        if(!Validator.validateTime(args[0]) || !Validator.validateDuration(args[1]) || args.length > 3){
             message.channel.send(usage);
             return;
         }
 
-        //Check if session name is defined or not
-        if(args[2] === undefined){
-            name = Moment().format(`DD-MM-YYYY_[SESSION]`);
-        }else{
-            name = args[2].toString().replace(/,/g, ' ');
-        }
-        
-        if(timeExpression.test(args[0])){
-            startTime = args[0].split(':');
-        }
-
-        if(args[0] === "now"){
-            startTime = Moment().format('HH:mm').split(':');
-        }
-
-        startDateTime = Moment(`${today} ${startTime[0]}:${startTime[1]}:00`,`YYYY/MM/DD HH:mm:ss`);
-
-        durationArray = args[1].replaceAll(/\D/g,',').split(',');
-
-        
-        let duration = Moment.duration({
-            hours: durationArray[0],
-            minutes: durationArray[1],
-            seconds: durationArray[2]
-        });
+        let startDateTime = Time.parseDateTime(args[0]);
+        let duration = Time.parseDuration(args[1]);
+        let name = Validator.validateAndGetName(args[2]);
 
         let session = new Session(name, startDateTime, duration);
 
@@ -112,9 +84,7 @@ module.exports = {
                 {name:'Session Start' ,value:`${session.startDateTime.format('DD/MMM/YYYY [-] HH:mm')}`},
                 {name:'Session End' ,value:`${session.endDateTime.format('DD/MMM/YYYY [-] HH:mm' )}`},
                 {name:'Session Duration' ,value:`${session.duration.hours()} Hours ${session.duration.minutes()} Minutes ${session.duration.seconds()} Seconds`});
-
         message.channel.send(notification);
-        
 
         setTimeout(
             function(){
@@ -135,6 +105,5 @@ module.exports = {
 
                 session.removeSession(name);
         }, duration.asMilliseconds());
-        
     }
 }

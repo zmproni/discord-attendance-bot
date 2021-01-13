@@ -4,6 +4,8 @@ const config = require("../utils/Config");
 const Session = require("../structure/Session");
 const Attendance = require("../structure/Attendance");
 const Moment = require('moment');
+const Validator = require("../utils/Validator");
+const Time = require("../utils/Time");
 
 const command = "attend";
 const color = "#b03ed6";
@@ -44,14 +46,10 @@ module.exports = {
     let session = new Session();
     const username = message.author.username;
     const nickname = message.member.displayName; 
-    let timeExpression = /^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?/g;
-    let today = Moment().format('YYYY/MM/DD');
-    let timeArray = [];
     let time;
     let note = args[1]; 
 
-    if(args.length > 2 || !timeExpression.test(args[0]) && args[0] != 'now' ||
-      args[0]==undefined || args[1]==undefined){
+    if(args.length > 2 || !Validator.validateTime(args[0]) || args[1]==undefined){
       message.channel.send(usage);
       return;
     }
@@ -66,15 +64,7 @@ module.exports = {
     }
 
     let currentSession = session.getActiveSession();
-    
-    if(args[0] == 'now'){
-      timeArray = Moment().format('HH:mm').split(':');
-    }
-    else{
-      timeArray = args[0].split(':');
-    }
-    
-    time = Moment(`${today} ${timeArray[0]}:${timeArray[1]}:00`, `YYYY/MM/DD HH:mm:ss`);
+    time = Time.parseDateTime(args[0]);
 
     if(time.isBefore(currentSession.startDateTime) || time.isAfter(currentSession.endDateTime)){
       const attendTimeInvalid = new Discord.MessageEmbed()
