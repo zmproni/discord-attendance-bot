@@ -27,53 +27,54 @@ async function authorize(){
 //const gsapi = google.sheets({ sheets, authClient });
 }
 authorize();
-const spreadsheetID = '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk'; //link to the spreadsheet -- admin to fill in
+//const spreadsheetID = '1HEpmFDBRj2kia8KlLMQOBt5RyadgGyELQXx0MnyPBxk'; //link to the spreadsheet -- admin to fill in
+const newSpreadsheet = (await sheets.spreadsheets,create(request)).data;
 
-// async function viewAttendance(viewOpt){
-//   const viewOpt = { 
-//     spreadsheetId: spreadsheetID,
-//     range: 'Attendees!B:E',
-//     dateTimeRenderOption: schedule.startDateTime
-//    };
-//   let data = await gsapi.spreadsheets.values.get(viewOpt);
-//   return data;
+async function viewAttendance(viewOpt){
+  const viewOpt = { 
+    spreadsheetId: newSpreadsheet,
+    range: 'Attendees!B:E',
+    dateTimeRenderOption: schedule.startDateTime
+   };
+  let data = await gsapi.spreadsheets.values.get(viewOpt);
+  return data;
 
-// }
+}
 
-// async function blankInput(r){
-//   let data = viewAttendance(viewOpt);
-//   let dataArray = data.data.values;
-//   let newDataArray = dataArray.map(function(r) {
-//     while (r.length < 5) {
-//      console.log("Error, please re-enter your details");
-//      r.push('');
-//     }
-//     let r = await gsapi.spreadsheets.values.clear(r);
-//     return r;
-//    } );
-//   }
+async function blankInput(r){
+  let data = viewAttendance(viewOpt);
+  let dataArray = data.data.values;
+  let newDataArray = dataArray.map(function(r) {
+    while (r.length < 5) {
+     console.log("Error, please re-enter your details");
+     r.push('');
+    }
+    let r = await gsapi.spreadsheets.values.clear(r);
+    return r;
+   } );
+  }
 
-// async function editAttendance(updateOpt){
-//   const updateOpt = { 
-//     spreadsheetId,
-//     range: 'Attendees!B:E',
-//     valueInputOption: 'USER_ENTERED', //search for username - if username == cell value: replace to new values
-//     resource: { values: newDataArray }
-//   };
-//   let res = await gsapi.spreadsheets.values.update(updateOpt);
-//   return res;
-// }
+async function editAttendance(updateOpt){
+  const updateOpt = { 
+    spreadsheetId: newSpreadsheet,
+    range: 'Attendees!B:E',
+    valueInputOption: 'USER_ENTERED', //search for username - if username == cell value: replace to new values
+    resource: { values: newDataArray }
+  };
+  let res = await gsapi.spreadsheets.values.update(updateOpt);
+  return res;
+}
 
-// async function addAttendance(){
-//   const addOpt = { 
-//     spreadsheetId,
-//     range: '',
-//     valueInputOption: 'USER_ENTERED',
-//     insertDataOption:'',
-//     resource: { values: newDataArray }
-//   };
-//   let res = await gsapi.spreadsheets.values.append(addOpt);
-//   return res;
-// }
+async function addAttendance(){
+  const addOpt = { 
+    spreadsheetId: newSpreadsheet,
+    range: '',
+    valueInputOption: 'USER_ENTERED',
+    insertDataOption:'',
+    resource: { values: newDataArray }
+  };
+  let res = await gsapi.spreadsheets.values.append(addOpt);
+  return res;
+}
 
 

@@ -1,3 +1,4 @@
+//ignore this for now
 require("dotenv").config();
 module.exports = {
   "type": "service_account",
