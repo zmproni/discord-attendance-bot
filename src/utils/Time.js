@@ -1,27 +1,27 @@
-const Moment = require("Moment");
+const Moment = require("moment");
 const Validator = require('./Validator');
 
 const dateFormat = "DD-MM-YYYY";
 const timeFormat = "HH:mm";
 const today = Moment().format(dateFormat);
 
-class Time{
-    constructor(){}
+class Time {
+    constructor() {}
 
-    parseDateTime(time){
+    parseDateTime(time) {
         let startTime;
 
-        if(time === "now"){
+        if (time === "now") {
             startTime = Moment().format(timeFormat).split(':');
-        }else{
+        } else {
             startTime = time.split(':');
         }
 
-        return Moment(`${today} ${startTime[0]}:${startTime[1]}`,`${dateFormat} ${timeFormat}`);
+        return Moment(`${today} ${startTime[0]}:${startTime[1]}`, `${dateFormat} ${timeFormat}`);
     }
 
-    parseDuration(durationInput){
-        let durationArray = durationInput.replaceAll(/\D/g,',').split(',');
+    parseDuration(durationInput) {
+        let durationArray = durationInput.replaceAll(/\D/g, ',').split(',');
         let duration = Moment.duration({
             hours: durationArray[0],
             minutes: durationArray[1],
