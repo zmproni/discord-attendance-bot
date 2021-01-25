@@ -1,5 +1,4 @@
 var nodemailer = require('nodemailer');
-var converter = require('json-2-csv');
 
 var transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -8,33 +7,17 @@ var transporter = nodemailer.createTransport({
       pass: 'discord123'
     }
   });
-//convert data to csv
-var data = [
-  {
-    "id": 1, 
-    "name":"Kim Woo Bin",
-    "startDateTime": 0900,
-    "duration": 9,
-     "type": "remote"
-      }
-    ];
-converter.json2csv(data, (err, csv) => {
-  if (err){
-    throw err;
-  }
   var mailOptions = {
     from: 'discordattendancebot@gmail.com',
     to: 'frznfzl97@gmail.com',
     subject: 'Attendance for the day',
-    attachments: [{
-      filename: 'attendance.csv', 
-      content: csv,
-    }]
-  }
-});
+    text: 'alessandro is stupid'
+    //attachments: [{
+    //  filename: 'attendance.csv', 
+    //  content: csv,
+    //}]
+  };
 
-
-   
   transporter.sendMail(mailOptions, function(error, info){
     if (error) {
       console.log(error);
