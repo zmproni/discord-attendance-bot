@@ -24,8 +24,11 @@
     "dotenv": "^8.2.0",
     "google-spreadsheet": "^3.1.15",
     "googleapis": "^39.2.0",
+    "json-2-csv": "^3.10.2",
+    "json2csv": "^5.0.5",
     "moment": "^2.29.1",
-    "nanoid": "^3.1.20"
+    "nanoid": "^3.1.20",
+    "nodemailer": "^6.4.17"
   },
   "keywords": [],
   "author": ""
